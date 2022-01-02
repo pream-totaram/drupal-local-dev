@@ -1,0 +1,50 @@
+version: "3.8"
+services:
+  reverse-proxy:
+    image: traefik
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  app:
+    build:
+      context: .
+    volumes:
+      - ./drupal/profiles:/var/www/html/profiles
+      - ./drupal/modules:/var/www/html/modules
+      - ./drupal/sites:/var/www/html/sites
+      - ./drupal/themes:/var/www/html/themes
+      - application:/var/www/html
+      - ./php/www.conf.default:/usr/local/etc/php-fpm.d/www.conf.default
+      - ./php/entrypoint.sh:/opt/drupal/entrypoint.sh
+    working_dir: /var/www/html
+
+    depends_on:
+      - db
+    entrypoint: /opt/drupal/entrypoint.sh
+  web:
+    image: nginx
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - application:/var/www/html
+    ports:
+      - 8080:80
+    depends_on:
+      - app
+    labels:
+      - "traefik.http.routers.drupal.rule=Host(`drupal.localhost`)"
+  db:
+    image: mariadb:latest
+    environment:
+      MARIADB_ROOT_PASSWORD: password
+      MARIADB_USER: drupal
+      MARIADB_PASSWORD: drupal
+      MARIADB_DATABASE: drupal
+    volumes:
+      - db_data:/var/lib/mysql
+  redis:
+    image: redis:alpine
+volumes:
+  application:
+  db_data:
