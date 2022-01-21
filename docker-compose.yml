@@ -18,6 +18,8 @@ services:
       - application:/var/www/html
       - ./php/www.conf.default:/usr/local/etc/php-fpm.d/www.conf.default
       - ./php/entrypoint.sh:/opt/drupal/entrypoint.sh
+      - ./php/composer.json:/opt/drupal/composer.json
+      - ./php/composer.lock:/opt/drupal/composer.lock
     working_dir: /var/www/html
 
     depends_on:
