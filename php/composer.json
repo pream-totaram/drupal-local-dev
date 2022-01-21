@@ -19,6 +19,7 @@
         "drupal/adminimal_theme": "^1.6",
         "drupal/console": "^1.9",
         "drupal/core-composer-scaffold": "^9.2",
+        "drupal/core-dev": "^9.3",
         "drupal/core-project-message": "^9.2",
         "drupal/core-recommended": "^9.2",
         "drush/drush": "^10.6"
@@ -29,7 +30,13 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/installers": true,
+            "drupal/console-extend-plugin": true,
+            "drupal/core-composer-scaffold": true,
+            "drupal/core-project-message": true
+        }
     },
     "extra": {
         "drupal-scaffold": {
