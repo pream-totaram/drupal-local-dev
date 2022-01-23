@@ -1,3 +1,4 @@
 drupal_installation/
 drupal/sites/default/files/*
 drupal/modules/*
+drupal/sites/simpletest/
