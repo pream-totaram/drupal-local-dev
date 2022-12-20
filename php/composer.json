@@ -17,6 +17,7 @@
     "require": {
         "composer/installers": "^1.9",
         "drupal/adminimal_theme": "^1.6",
+        "drupal/business_responsive_theme": "^2.0",
         "drupal/console": "^1.9",
         "drupal/core-composer-scaffold": "^9.2",
         "drupal/core-dev": "^9.3",
@@ -36,7 +37,8 @@
             "composer/installers": true,
             "drupal/console-extend-plugin": true,
             "drupal/core-composer-scaffold": true,
-            "drupal/core-project-message": true
+            "drupal/core-project-message": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
     "extra": {
