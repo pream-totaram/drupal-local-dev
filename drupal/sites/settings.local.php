@@ -33,7 +33,7 @@
  * @see https://wiki.php.net/rfc/expectations
  */
 assert_options(ASSERT_ACTIVE, TRUE);
-\Drupal\Component\Assertion\Handle::register();
+assert_options(ASSERT_EXCEPTION, TRUE);
 
 /**
  * Enable local development services.
@@ -47,12 +47,6 @@ $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml'
  * example the database connection failed, we rely only on this value.
  */
 $config['system.logging']['error_level'] = 'verbose';
-
-/**
- * Disable CSS and JS aggregation.
- */
-$config['system.performance']['css']['preprocess'] = FALSE;
-$config['system.performance']['js']['preprocess'] = FALSE;
 
 /**
  * Disable the render cache.
@@ -153,3 +147,11 @@ $settings['skip_permissions_hardening'] = TRUE;
  * the language or field module.
  */
 # $settings['config_exclude_modules'] = ['devel', 'stage_file_proxy'];
+
+
+/**
+ * Disable CSS and JS aggregation.
+ */
+$config['system.performance']['css']['preprocess'] = FALSE;
+$config['system.performance']['js']['preprocess'] = FALSE;
+
