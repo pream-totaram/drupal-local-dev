@@ -1,4 +1,4 @@
-FROM drupal@sha256:910d48868a0d48c7621996c0597e7319673e7cddd40b1080545a5b5ed93d58c3
+FROM drupal@sha256:10b31abc9d6372b5a102ba1ac49215bf9ac8a154d2a9b702c3bb020c46185e78
 COPY ./php/composer.json /opt/drupal/composer.json
 COPY ./php/composer.lock /opt/drupal/composer.lock
 RUN apt update \
