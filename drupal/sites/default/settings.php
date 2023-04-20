@@ -700,6 +700,8 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
  * \Drupal\Component\Serialization\SerializationInterface interface.
  */
 # $settings['yaml_parser_class'] = NULL;
+$settings['preprocess_css'] = FALSE;
+$settings['preprocess_js'] = FALSE;
 
 /**
  * Trusted host configuration.

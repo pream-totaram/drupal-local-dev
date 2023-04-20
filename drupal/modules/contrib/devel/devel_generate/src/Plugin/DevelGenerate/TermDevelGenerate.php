@@ -30,7 +30,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "minimum_depth" = 1,
  *     "maximum_depth" = 4,
  *     "kill" = FALSE,
- *   }
+ *   },
+ *   dependencies = {
+ *     "taxonomy",
+ *   },
  * )
  */
 class TermDevelGenerate extends DevelGenerateBase implements ContainerFactoryPluginInterface {
@@ -268,6 +271,16 @@ class TermDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
     // vocab ids, so it can be used with array_rand().
     $vocabs = array_combine($parameters['vids'], $parameters['vids']);
 
+    // Delete terms from the vocabularies we are creating new terms in.
+    if ($parameters['kill']) {
+      $deleted = $this->deleteVocabularyTerms($vocabs);
+      $this->setMessage($this->formatPlural($deleted, 'Deleted 1 existing term', 'Deleted @count existing terms'));
+      if ($min_depth != 1) {
+        $this->setMessage($this->t('Minimum depth changed from @min_depth to 1 because all terms were deleted', ['@min_depth' => $min_depth]));
+        $min_depth = 1;
+      }
+    }
+
     // Build an array of potential parents for the new terms. These will be
     // terms in the vocabularies we are creating in, which have a depth of one
     // less than the minimum for new terms up to one less than the maximum.
@@ -277,7 +290,7 @@ class TermDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
       // Initialise the nested array for this vocabulary.
       $all_parents[$vid] = ['top_level' => [], 'lower_levels' => []];
       for ($depth = 1; $depth < $max_depth; $depth++) {
-        $query = \Drupal::entityQuery('taxonomy_term')->condition('vid', $vid);
+        $query = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE)->condition('vid', $vid);
         if ($depth == 1) {
           // For the top level the parent id must be zero.
           $query->condition('parent', 0);
@@ -320,12 +333,6 @@ class TermDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
       throw new \Exception(sprintf('Invalid minimum depth %s because there are no terms in any vocabulary at depth %s', $min_depth, $min_depth - 1));
     }
 
-    // Only delete terms from the vocabularies we can create new terms in.
-    if ($parameters['kill']) {
-      $deleted = $this->deleteVocabularyTerms($vocabs);
-      $this->setMessage($this->formatPlural($deleted, 'Deleted 1 existing term', 'Deleted @count existing terms'));
-    }
-
     // Insert new data:
     for ($i = 1; $i <= $parameters['num']; $i++) {
       // Select a vocabulary at random.
@@ -352,8 +359,8 @@ class TermDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
       }
       $term = $this->termStorage->create($values);
 
-      // A flag to let hook implementations know that this is a generated term.
-      $term->devel_generate = TRUE;
+      // Give hook implementations access to the parameters used for generation.
+      $term->devel_generate = $parameters;
 
       // Populate all fields with sample values.
       $this->populateFields($term);

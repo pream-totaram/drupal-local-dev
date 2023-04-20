@@ -207,7 +207,7 @@ class MenuDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
 
     // Delete custom menus.
     if ($values['kill']) {
-      list($menus_deleted, $links_deleted) = $this->deleteMenus();
+      [$menus_deleted, $links_deleted] = $this->deleteMenus();
       $this->setMessage($this->t('Deleted @menus_deleted menu(s) and @links_deleted other link(s).',
         ['@menus_deleted' => $menus_deleted, '@links_deleted' => $links_deleted]));
     }
@@ -271,9 +271,10 @@ class MenuDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
   protected function deleteMenus() {
     if ($this->moduleHandler->moduleExists('menu_ui')) {
       $menu_ids = [];
-      foreach (menu_ui_get_menus(FALSE) as $menu => $menu_title) {
-        if (strpos($menu, 'devel-') === 0) {
-          $menu_ids[] = $menu;
+      $all = Menu::loadMultiple();
+      foreach ($all as $menu) {
+        if (strpos($menu->id(), 'devel-') === 0) {
+          $menu_ids[] = $menu->id();
         }
       }
 
@@ -287,6 +288,7 @@ class MenuDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
     $link_ids = $this->menuLinkContentStorage->getQuery()
       ->condition('menu_name', 'devel', '<>')
       ->condition('link__options', '%' . $this->database->escapeLike('s:5:"devel";b:1') . '%', 'LIKE')
+      ->accessCheck(FALSE)
       ->execute();
 
     if ($link_ids) {
@@ -318,7 +320,7 @@ class MenuDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
       // machine-name length is 32, so allowing for prefix 'devel-' we can have
       // up to 26 here. For safety avoid accidentally reusing the same id.
       do {
-        $id = 'devel-' . $this->getRandom()->name(mt_rand(2, 26));
+        $id = 'devel-' . $this->getRandom()->word(mt_rand(2, 26));
       } while (array_key_exists($id, $menus));
 
       $menu = $this->menuStorage->create([
