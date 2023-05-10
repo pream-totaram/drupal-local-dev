@@ -1,0 +1,3 @@
+[submodule "instagram_block"]
+	path = drupal/modules/core/instagram_block
+	url = git@git.drupal.org:project/instagram_block.git
