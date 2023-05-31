@@ -20,11 +20,18 @@ services:
       - ./php/entrypoint.sh:/opt/drupal/entrypoint.sh
       - ./php/composer.json:/opt/drupal/composer.json
       - ./php/composer.lock:/opt/drupal/composer.lock
+      - ./php/conf.d/error_reporting.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/error_reporting.ini
     working_dir: /var/www/html
 
     depends_on:
       - db
     entrypoint: /opt/drupal/entrypoint.sh
+    environment:
+      - PHP_IDE_CONFIG=serverName=localhost
+      - SIMPLETEST_BASE_URL=http://drupal.localhost:80/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   web:
     image: nginx
     volumes:
@@ -34,6 +41,10 @@ services:
       - 8080:80
     depends_on:
       - app
+    networks:
+      default:
+        aliases:
+          - drupal.localhost
     labels:
       - "traefik.http.routers.drupal.rule=Host(`drupal.localhost`)"
   db:
